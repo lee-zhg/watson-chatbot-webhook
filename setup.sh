@@ -12,24 +12,24 @@ DB_SERVICE="$2"
 
 
 # create an IAM namespace
-ibmcloud fn namespace create slackbot --description "namespace for Slackbot tutorial"
+ibmcloud fn namespace create chatbot-promotion --description "namespace for Promotion tutorial"
 
 # set the new namespace as default
-ibmcloud fn property set --namespace slackbot
+ibmcloud fn property set --namespace chatbot-promotion
 
 # create package
-ibmcloud fn package create slackdemo
+ibmcloud fn package create chatbot-promotion-pkg
 
 # create action for setup using Node.js environment
-ibmcloud fn action create slackdemo/db2Setup db2-setup.js  --kind nodejs:10
+ibmcloud fn action create chatbot-promotion-pkg/db2Setup db2-setup.js  --kind nodejs:10
 
 # bind action to Db2 credentials
-ibmcloud fn service bind $DB_SERVICE slackdemo/db2Setup  --instance eventDB
+ibmcloud fn service bind $DB_SERVICE chatbot-promotion-pkg/db2Setup  --instance promotionDB
 
 # invoke actions to create table, then insert sample data
-ibmcloud fn action invoke slackdemo/db2Setup -p mode "[\"setup\"]" -r
-ibmcloud fn action invoke slackdemo/db2Setup -p mode "[\"sampledata\"]" -r
+ibmcloud fn action invoke chatbot-promotion-pkg/db2Setup -p mode "[\"setup\"]" -r
+ibmcloud fn action invoke chatbot-promotion-pkg/db2Setup -p mode "[\"sampledata\"]" -r
 
 # dispatcher with subfunctions as single action
-ibmcloud fn action create slackdemo/dispatch dispatch.js  --kind nodejs:10 --web true --web-secure $theSecret
-ibmcloud fn service bind $DB_SERVICE slackdemo/dispatch --instance eventDB
+ibmcloud fn action create chatbot-promotion-pkg/dispatch dispatch.js  --kind nodejs:10 --web true --web-secure $theSecret
+ibmcloud fn service bind $DB_SERVICE chatbot-promotion-pkg/dispatch --instance promotionDB
