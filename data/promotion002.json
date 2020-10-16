@@ -1,0 +1,9 @@
+{
+   "promotionid": "prom1002",
+   "desc": "Buy one hamburger and get 1/2 price for the 2nd hamburger",
+   "category": "promotion",
+   "location": "Dallas",
+   "begindate": "2020-06-01 00:00:00",
+   "enddate": "2021-12-31 23:59:00",
+   "link": "https://www.ibm.com"
+}
