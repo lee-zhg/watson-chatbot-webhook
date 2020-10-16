@@ -178,6 +178,8 @@ To perform the registration and setup, run the command below and this will execu
    ./setup_cloudfunctions.sh  YOURSECRET
    ```
 
+   > **Note**: `YOURSECRET` is a text string that helps to keep your cloud functions secure.
+
 1.  Obtain the URI for the deployed **controller** action.
 
    ```sh
