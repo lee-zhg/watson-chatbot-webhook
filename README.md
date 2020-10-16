@@ -16,7 +16,7 @@ This repo is part of Watson chatbot serial. The entire serial includes
 
 > Click [here](https://www.ibm.com/products/cloud-pak-for-data) for more information about IBM Cloud Pak for Data.
 
-Adopted from IBM code pattern [Build a database-driven Slackbot](https://github.com/IBM-Cloud/slack-chatbot-database-watson).
+Adopted from IBM code pattern [Build a database-driven Slackbot](https://github.com/IBM-Cloud/slack-chatbot-database-watson) and [COVID Crisis Communications Starter Kit](https://github.com/lee-zhg/Solution-Starter-Kit-Communication-2020).
 
 
 ## Use Case Flow
@@ -58,34 +58,60 @@ In case you don't have a `Watson Assistant` service instance in IBM Cloud, creat
 * [**Watson Assistant**](https://cloud.ibm.com/catalog/services/conversation)
 
 
-### Step 3 - Configure Watson Assistant
+### Step 3 - Create Watson Discovery Service
 
-If you have completed the exercise of [Basic Burger Ordering Chatbot with Watson Assistant Service](https://github.com/lee-zhg/watson-chatbot-simple.git), you should have configured a `skill`. You may re-use the same `skill` for the exercise in this repo.
+If you don't have a `Watson Discovery` service instance in IBM Cloud, create one and name it `burger-discovery-service`:
 
-If you don't have a `skill` configured, you may import a `skill` definition that is used by the chatbot,
+* [**Watson Discovery**](https://cloud.ibm.com/catalog/services/discovery)
 
-1. Login to [IBM Cloud](https://cloud.ibm.com).
+Take notes of 
+   * API key
+   * URL
 
-1. On the dashboard, find and open your `Watson Assistant` service instance.
-
-1. Click `Launch Watson Assistant` on the `Manage` tab.
-
-1. Select the `Skills` tab in the left navigation tab.
-
-1. Click `Create skill`.
-
-1. Select the `Dialog skill` option and then click `Next`.
-
-1. Go to the `Import skill` tab.
-
-1. Click the link `Drag and drop file here or click to select a file`.
-
-1. Go to your cloned repo dir, and `Open` file [`data/skill-watson-burger-simple.json`](data/skill-watson-burger-advanced.json).
-
-1. Click `Import`.
+!["Discovery API key and URL"](doc/images/discovery01.png)
 
 
-### Step 4 - Create DB2 Service Instance
+### Step 4 - Configure Watson Discovery Service
+
+To configure Watson Discover service,
+
+1. Select `Launch Watson Discovery` button from your instance of Watson Discovery service.
+
+1. Select `Upload your own data` link.
+
+1. Select a plan if prompted.
+
+1. Give a unique `collection name`, for example, "onsales". And `Create`.
+
+1. Click `select documents` link.
+
+1. Select `data/promotion001.json` and `data/promotion002.json` files in the cloned repository folder. Then, `Open`.
+
+   !["Discovery"](doc/images/discovery02.png)
+
+1. Click `View API detail`.
+
+1. Take note of information
+   - Collection ID
+   - Configuration ID
+   - Environment ID
+
+1. Select `Build quries` link in the left pane.
+
+1. Select `Search for documents` link to extend.
+
+1. To verify the configuration and file loading, enter `half price` under `Use natural language`.
+
+1. `Run query`.
+
+
+
+
+
+
+
+
+### Step 4 - Create DB2 Service Instance - Under Construction
 
 1. Login to IBM Cloud in the terminal environment.
 
@@ -142,112 +168,175 @@ In this section, you are going to register actions for Cloud Functions and bind 
 
 Because the Cloud Functions is not the focus of the repo, scripts are provided to automate the Cloud Functions configuration. In addition to be used by the Watson chatbot webhook, the Cloud Functions is also configured for the environment preparation.
 
-To perform the registration and setup, run the command below and this will execute the **setup.sh** script. If your system does not support shell commands, copy each line out of the file **setup.sh** and execute it individually.
+To perform the registration and setup, run the command below and this will execute the **setup_cloudfunctions.sh** script. If your system does not support shell commands, copy each line out of the file **setup_cloudfunctions.sh** and execute it individually.
+
+1. Update file `controller_parameters.json`.
 
 1. Configure Cloud Function
 
    ```sh
-   ./setup.sh YOURSECRET "dashdb-for-transactions"
+   ./setup_cloudfunctions.sh  YOURSECRET
    ```
 
-   **Note:** The script also inserts couple of rows of sample data. You can disable this by outcommenting the following line in the above script: `#ibmcloud fn action invoke slackdemo/db2Setup -p mode "[\"sampledata\"]" -r`.
-
-1.  Obtain the URI for the deployed **dispatch** action.
+1.  Obtain the URI for the deployed **controller** action.
 
    ```sh
-   ibmcloud fn action get chatbot-promotion-pkg/dispatch --url
+   ibmcloud fn action get chatbot-promotion-pkg/controller --url
    ```
 
    Keep this information available for the next section.
 
 
+### Step 6 - Configure Webhook for Watson Assistant Service
+
+To configure the Watson Assistant webhook,
+
+1. Login to [IBM Cloud](https://cloud.ibm.com).
+
+1. On the dashboard, find and open your `Watson Assistant` service instance.
+
+1. Click `Launch Watson Assistant` on the `Manage` tab.
+
+1. Select the `Skills` tab in the left navigation tab.
+
+1. Select the `watson-burger-simple` skill.
+
+1. Select `Options` menu in the left pane.
+
+1. Select `Webhooks` option.
+
+1. In `URL` field, enter the url value returned by the command `ibmcloud fn action get chatbot-promotion-pkg/controller --url` in the previous section. Make sure to add a .json at the end of the URL to indicate that JSON data should be returned. The change is automatically saved when you tab out the field.
+
+   >**Note**: Make sure to add a .json at the end of the URL to indicate that JSON data should be returned. 
+
+1. Click `Add header` link.
+
+1. Enter `X-Require-Whisk-Auth` in the `Header name` field.
+
+1. Enter your `YOURSECRET` which you used when create the cloud function.
+
+
+### Step 7 - Try it
+
+`Try it` feature provides a quick testing option while you develop a skill.
+
+!["watson-burger-simple Example"](doc/images/try_it01.png)
+
+To test the chatbot via `try it` link,
+
+1. Login to [IBM Cloud](https://cloud.ibm.com).
+
+1. On the dashboard, find and open your `Watson Assistant` service instance.
+
+1. Click `Launch Watson Assistant` on the `Manage` tab.
+
+1. Select the `Skills` tab in the left navigation tab.
+
+1. Select `watson-burger-simple` tile to open it.
+
+1. Click `Try it` link.
+
+1. "Try it out` window open on the right. You should be familar to the chatbot UI now.
+
+#### 7.1 - Inquire Covid-19 information
+
+1. Inquire the latest Covid-19 information by entering `latest covid-19 data`.
+
+1. The `Inquire COVID-19` node understands the `intent` and trigger a Cloud Functions action running in IBM Cloud. 
+
+   !["watson-burger-simple Example"](doc/images/inquire-covid-19-01.png)
+
+   * Watson chatbot passes `api` as the parameter `type`, so the cloud function action makes a API call to inquire the latest data of COVID-19.
+   * Contents returned by the cloud function is stored in `webhook_result_2` variable.
+   * The node is configured to display `<? $webhook_result_2.result ?>` as the chatbot response.
+
+1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+
+   ```
+   Total Cases: 38911224
+   Total Deaths: 1098181
+   Total Recovered: 26879578
+   Source: Johns Hopkins CSSE
+   ```
+
+#### 7.2 - Inquire Promotion Information Stored in Waston Discovery Service
+
+1. Make a promotion inquiry by entering `any special`.
+
+1. The `Inquire promotion` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
+
+   !["watson-burger-simple Example"](doc/images/inquire-promotion01.png)
+
+   * Watson chatbot passes `discovery` as the parameter `type`, so the cloud function action makes a API call to Watson Discovery service which returns special promotion information.
+   * The node has an optional slot. If the promotional item or term information is identified, it'll be stored in entity `@promotion_term`. Because this is an optional slot, when no promotional item or term is identified, end user won't be prompted for. In this example, `@promotion_term` contains no information as it's a general promotion inquiry. 
+   * Contents returned by the cloud function is stored in `webhook_result_1` variable.
+   * The node is configured to display `<? $webhook_result_1.result ?>` as the chatbot response.
+   * To identify what JSON elements are available in the return object, `<? $webhook_result_1 ?>` can be tested at development phase.
+
+1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+
+   ```
+   Here are available specials: 
+
+   Promotion: Free small drink with purchase of any meal,
+   Promotion Location: US,
+   Start Date: 2020-10-01 00:00:00
+   End Date: 2020-12-31 23:59:00
+   Coupon Link: https://www.ibm.com/events/think/ 
+
+   Promotion: Buy one hamburger and get 1/2 price for the 2nd hamburger,
+   Promotion Location: Dallas,
+   Start Date: 2020-06-01 00:00:00
+   End Date: 2021-12-31 23:59:00
+   Coupon Link: https://www.ibm.com 
+   ```
+
+#### 7.3 - Inquire Hamburger Promotion Information Stored in Waston Discovery Service
+
+1. Make a promotion inquiry by entering `any special for ordering hamburger`.
+
+1. This time, the Watson assistant has two understanding
+   * `inquire_promotion` as the `intent`
+   * `hamburger` in the entity `@promotion_term`
+
+1. Since the content in the entity `@promotion_term` is used in the cloud function when making inquires to Watson Discovery service, this time the chatbot only returns the `hamburger` related promotion.
+
+   ```
+   Here are available specials: 
+
+   Promotion: Buy one hamburger and get 1/2 price for the 2nd hamburger,
+   Promotion Location: Dallas,
+   Start Date: 2020-06-01 00:00:00
+   End Date: 2021-12-31 23:59:00
+   Coupon Link: https://www.ibm.com 
+   ```
+
+1. Configuration of the `Inquire promotion` node demonstrates 
+   * how to collect inquiry term via the chatbot and pass it to cloud function as parameter
+   * how to build chatbot response based on contents returned by the webhook
+
+
+## License
+
+This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](https://www.apache.org/licenses/LICENSE-2.0.txt).
+
+[Apache Software License (ASL) FAQ](https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
+
+## Links
+
+* [Demo on youtube](https://youtu.be/6QlAnqSiWvo)
+* [IBM Watson Assistant Docs](https://cloud.ibm.com/docs/services/conversation/dialog-build.html#dialog-build)
+* [Blog for IBM Watson Assistant Slots Code Pattern](https://developer.ibm.com/code/2017/09/19/managing-resources-efficiently-watson-conversation-slots/)
+
+## Learn more
+
+* **Artificial Intelligence Code Patterns**: Enjoyed this Code Pattern? Check out our other [AI Code Patterns](https://developer.ibm.com/technologies/artificial-intelligence/).
+* **AI and Data Code Pattern Playlist**: Bookmark our [playlist](https://www.youtube.com/playlist?list=PLzUbsvIyrNfknNewObx5N7uGZ5FKH0Fde) with all of our Code Pattern videos
+* **With Watson**: Want to take your Watson app to the next level? Looking to utilize Watson Brand assets? [Join the With Watson program](https://www.ibm.com/watson/with-watson/) to leverage exclusive brand, marketing, and tech resources to amplify and accelerate your Watson embedded commercial solution.
+* **Kubernetes on IBM Cloud**: Deliver your apps with the combined the power of [Kubernetes and Docker on IBM Cloud](https://www.ibm.com/cloud/container-service)
 
 
 
-
-
-
-## Create an assistant and integrate with Slack
-{: #slack-chatbot-database-watson-4}
-{: step}
-
-Now, you will create an assistant associated with the skill from before and integrate it with Slack.
-1. Click on **Assistants** in the top left navigation, then click on **Create assistant**.
-2. In the dialog, fill in **TutorialAssistant** as name, then click **Create assistant**. On the next screen, choose **Add dialog skill**. Thereafter, choose **Add existing skill**, pick **TutorialSlackbot** from the list and add it.
-3. After adding the skill, click **Add integration**, then from the list of **Third-party integrations** select **Slack**.
-4. Follow the step by step instructions to integrate your chatbot with Slack. More information about it is available in the topic [Integrating with Slack](https://{DomainName}/docs/assistant?topic=assistant-deploy-slack).
-
-## Test the Slackbot and learn
-{: #slack-chatbot-database-watson-5}
-{: step}
-Open up your Slack workspace for a test drive of the chatbot. Begin a direct chat with the bot.
-
-1. Type **help** into the messaging form. The bot should respond with some guidance.
-2. Now enter **new event** to start gathering data for a new event record. You will use {{site.data.keyword.conversationshort}} slots to collect all the necessary input.
-3. First up is the event identifier or name. Quotes are required. They allow entering more complex names. Enter **"Meetup: IBM Cloud"** as the event name. The event name is defined as a pattern-based entity **eventName**. It supports different kinds of double quotes at the beginning and ending.
-4. Next is the event location. Input is based on the [system entity **sys-location**](https://{DomainName}/docs/assistant?topic=assistant-system-entities#system-entity-details). As a limitation, only cities recognized by {{site.data.keyword.conversationshort}} can be used. Try **Friedrichshafen** as a city.
-5. Contact information such as an email address or URI for a website is asked for in the next step. Start with **https://www.ibm.com/events**. You will use a pattern-based entity for that field.
-6. The next questions are gathering date and time for the begin and end. **sys-date** and **sys-time** are used which allow for different input formats. Use **next Thursday** as start date, **6 pm** for the time, use the exact date of next Thursday, e.g., **2019-05-09** and **22:00** for the end date and time.
-7. Last, with all data collected, a summary is printed and a server action, implemented as {{site.data.keyword.openwhisk_short}} action, is invoked to insert a new record into Db2. Thereafter, dialog switches to a child node to clean up the processing environment by removing the context variables. The entire input process can be canceled anytime by entering **cancel**, **exit** or similar. In that case, the user choice is acknowledged and the environment cleaned up.
-  ![Sample chat in the Slack app](images/solution19/SlackSampleChat.png)
-
-With some sample data in it is time to search.
-1. Type in **show event information**. Next is a question whether to search by identifier or by date. Enter a **name** and for the next question **"Think 2019"**. Now, the chatbot should display information about that event. The dialog has multiple responses to choose from.
-2. With {{site.data.keyword.conversationshort}} as a backend, it is possible to enter more complex phrases and thereby skipping parts of the dialog. Use **show event by the name "Think 2019"** as input. The chatbot directly returns the event record.
-3. Now you are going to search by date. A search is defined by a pair of dates, the event start date has to be between. With **search conference by date in February 2019** as input, the result should be the **Think 2019** event again. The entity **February** is interpreted as two dates, February 1st, and February 28th, thereby providing input for the start and end of the date range. [If no year 2019 would be specified, a February looking ahead would be identified](https://{DomainName}/docs/assistant?topic=assistant-system-entities#system-entities-sys-date-time).
-
-After some more searches and new event entries, you can revisit the chat history and improve the future dialog. Follow the instructions in the [{{site.data.keyword.conversationshort}} documentation on **Improving understanding**](https://{DomainName}/docs/assistant?topic=assistant-logs-intro#logs_intro).
-
-## Share resources
-{: #slack-chatbot-database-watson-6}
-{: step}
-
-If you want to work with others on resources of this solution tutorial, you can share all or only some of the components. [{{site.data.keyword.cloud_notm}} Identity and Access Management (IAM)](https://{DomainName}/docs/account?topic=account-iamoverview) enables the authentication of users and service IDs and the access control to cloud resources. For granting access to a resource, you can assign [predefined access roles](https://{DomainName}/docs/account?topic=account-userroles) to either a user, a service ID, or to an [access group](https://{DomainName}/docs/account?topic=account-groups). Details on how you can set up access control is discussed in the blog [IBM Cloud Security Hands-On: Share Your Chatbot Project](https://www.ibm.com/cloud/blog/share-your-chatbot-project).
-
-
-## Remove resources
-{: #slack-chatbot-database-watson-7}
-{:removeresources}
-{: step}
-
-Executing the cleanup script in the main directory deletes the event table from {{site.data.keyword.Db2_on_Cloud_short}} and removes the actions from {{site.data.keyword.openwhisk_short}}. This might be useful when you start modifying and extending the code. The cleanup script does not change the {{site.data.keyword.conversationshort}} workspace or skill.
-```sh
-sh cleanup.sh
-```
-{: pre}
-
-In the [{{site.data.keyword.Bluemix_short}} Resource List](https://{DomainName}/resources) open the overview of your services. Locate the instance of the {{site.data.keyword.conversationshort}} service, then delete it.
-
-## Expand the tutorial
-{: #slack-chatbot-database-watson-8}
-Want to add to or change this tutorial? Here are some ideas:
-1. Add search capabilities to, e.g., wildcard search or search for event durations ("give me all events longer than 8 hours").
-2. Use {{site.data.keyword.databases-for-postgresql}} instead of {{site.data.keyword.Db2_on_Cloud_short}}.
-3. Add a weather service and retrieve forecast data for the event date and location.
-4. [Control the encryption keys for your database by adding {{site.data.keyword.keymanagementservicelong_notm}}](https://{DomainName}/docs/Db2onCloud?topic=Db2onCloud-key-protect).
-5. Export event data as iCalendar **.ics** file.
-
-
-## Related content
-{: #slack-chatbot-database-watson-9}
-{:related}
-
-Here are links to additional information on the topics covered in this tutorial.
-
-Chatbot-related blog posts:
-* [Chatbots: Some tricks with slots in IBM Watson Conversation](https://www.ibm.com/cloud/blog/chatbots-some-tricks-with-slots-in-ibm-watson-conversation)
-* [Lively chatbots: Best Practices](https://www.ibm.com/blogs/bluemix/2017/07/lively-chatbots-best-practices/)
-* [Building chatbots: more tips and tricks](https://www.ibm.com/blogs/bluemix/2017/06/building-chatbots-tips-tricks/)
-* [Add Watson Discovery News to your Chatbot](https://www.ibm.com/cloud/blog/add-watson-discovery-news-to-your-chatbot)
-* [IBM Cloud Security Hands-On: Share Your Chatbot Project](https://www.ibm.com/cloud/blog/share-your-chatbot-project)
-
-Documentation and SDKs:
-* GitHub repository with [tips and tricks for handling variables in IBM Watson Conversation](https://github.com/IBM-Cloud/watson-conversation-variables)
-* [{{site.data.keyword.openwhisk_short}} documentation](https://{DomainName}/docs/openwhisk)
-* Documentation: [IBM Knowledge Center for {{site.data.keyword.Db2_on_Cloud_short}}](https://www.ibm.com/support/knowledgecenter/en/SS6NHC/com.ibm.swg.im.dashdb.kc.doc/welcome.html)
-* [Free Db2 edition for developers](https://www.ibm.com/us-en/marketplace/ibm-db2-direct-and-developer-editions) for developers
-* Documentation: [API Description of the ibm_db Node.js driver](https://github.com/ibmdb/node-ibm_db)
-* [{{site.data.keyword.cloudantfull}} documentation](https://{DomainName}/docs/Cloudant?topic=cloudant-overview#overview)
 
 
 
