@@ -1,6 +1,6 @@
 {
-  "api_key": "AFjEQ621ZXltc14Qrind3cbUpc8NgpcRe36FQFw9e9pp",
-  "url": "https://api.us-south.discovery.watson.cloud.ibm.com/instances/0657df3c-6e92-4a4a-a28c-edeb90575cc7",
-  "collection_id": "cd86ebc9-a878-4a83-9854-a431a78c054a",
-  "env_id": "4a9cc8ea-c7cf-43ae-a1b9-c6575853562c"
+  "api_key": "<Watson Discovery API key>",
+  "url": "<Watson Discovery URL>",
+  "collection_id": "<Watson Discovery Collection ID>",
+  "env_id": "<Watson Discovery Environment ID>"
 }
