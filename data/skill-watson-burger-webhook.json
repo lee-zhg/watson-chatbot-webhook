@@ -68,6 +68,33 @@
       "description": ""
     },
     {
+      "intent": "inquire-db2-promotion",
+      "examples": [
+        {
+          "text": "any db2 discount"
+        },
+        {
+          "text": "any db2 promotion for burger"
+        },
+        {
+          "text": "any db2 promotion for drink"
+        },
+        {
+          "text": "any db2 sales for fries"
+        },
+        {
+          "text": "any db2 special for burger"
+        },
+        {
+          "text": "any db2 special for drink"
+        },
+        {
+          "text": "any db2 special for fries"
+        }
+      ],
+      "description": ""
+    },
+    {
       "intent": "inquire-promotion",
       "examples": [
         {
@@ -96,33 +123,6 @@
         },
         {
           "text": "is there any promotion"
-        }
-      ],
-      "description": ""
-    },
-    {
-      "intent": "inquire-db2-promotion",
-      "examples": [
-        {
-          "text": "any db2 discount"
-        },
-        {
-          "text": "any db2 promotion for burger"
-        },
-        {
-          "text": "any db2 promotion for drink"
-        },
-        {
-          "text": "any db2 sales for fries"
-        },
-        {
-          "text": "any db2 special for burger"
-        },
-        {
-          "text": "any db2 special for drink"
-        },
-        {
-          "text": "any db2 special for fries"
         }
       ],
       "description": ""
@@ -646,7 +646,7 @@
   },
   "webhooks": [
     {
-      "url": "https://us-south.functions.appdomain.cloud/api/v1/web/f426fa7a-3320-47cd-9a6e-cf0ae6e22890/chatbot-promotion-pkg/controller.json",
+      "url": "https://us-south.functions.appdomain.cloud/api/v1/web/687a4a21-684c-4c4f-9dc9-68f530a01d07/chatbot-promotion-pkg/controller.json",
       "name": "main_webhook",
       "headers": [
         {
@@ -802,6 +802,17 @@
     },
     {
       "type": "event_handler",
+      "output": {},
+      "parent": "slot_2_1605724823628",
+      "context": {
+        "promotion_term": "@promotion_term"
+      },
+      "conditions": "@promotion_term",
+      "event_name": "input",
+      "dialog_node": "handler_3_1605724823628"
+    },
+    {
+      "type": "event_handler",
       "output": {
         "text": {
           "values": [
@@ -839,6 +850,14 @@
       "conditions": "@mac_size",
       "event_name": "input",
       "dialog_node": "handler_4_1599581836010"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_2_1605724823628",
+      "event_name": "focus",
+      "dialog_node": "handler_4_1605724823628",
+      "previous_sibling": "handler_3_1605724823628"
     },
     {
       "type": "event_handler",
@@ -1038,6 +1057,35 @@
       "previous_sibling": "handler_10_1500495433159"
     },
     {
+      "type": "frame",
+      "title": "Inquire promotion from DB2 Database",
+      "output": {},
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "type": "db2",
+            "input": "@promotion_term"
+          },
+          "result_variable": "webhook_result_3"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#inquire-db2-promotion",
+      "dialog_node": "node_1_1605724823625",
+      "previous_sibling": "node_5_1602810148128"
+    },
+    {
       "type": "standard",
       "title": "Inquire COVID-19",
       "actions": [
@@ -1063,11 +1111,11 @@
       "conditions": "#inquire-covid-19",
       "digress_in": "does_not_return",
       "dialog_node": "node_3_1602871215441",
-      "previous_sibling": "node_5_1602810148128"
+      "previous_sibling": "node_1_1605724823625"
     },
     {
       "type": "frame",
-      "title": "Inquire promotion",
+      "title": "Inquire promotion from Discovery Service",
       "actions": [
         {
           "name": "main_webhook",
@@ -1314,6 +1362,41 @@
     {
       "type": "response_condition",
       "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "<? $webhook_result_3.result ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_1_1605724823625",
+      "conditions": "$webhook_result_3",
+      "dialog_node": "response_5_1605724823628",
+      "previous_sibling": "slot_2_1605724823628"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "no special was found"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_1_1605724823625",
+      "conditions": "anything_else",
+      "dialog_node": "response_6_1605724823628",
+      "previous_sibling": "response_5_1605724823628"
+    },
+    {
+      "type": "response_condition",
+      "output": {
         "text": {
           "values": [
             "no special was found"
@@ -1381,6 +1464,13 @@
       "variable": "$mac_mcflurry_size",
       "dialog_node": "slot_2_1597248236565",
       "previous_sibling": "slot_1_1597255411569"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_1_1605724823625",
+      "variable": "$promotion_term",
+      "dialog_node": "slot_2_1605724823628"
     },
     {
       "type": "slot",
