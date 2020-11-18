@@ -79,6 +79,8 @@ function formatStates(state) {
 }
 
 async function main(params) {
+
+  // retrieve data by calling COVID-19 API
   if (params.type === "api") {
     try {
       const summary = await request({
@@ -127,6 +129,8 @@ async function main(params) {
     } catch (err) {
       return { error: "it failed : " + err };
     }
+
+  // retrieve data from Watson Discovery
   } else if (params.type === "discovery") {
     const discovery = new DiscoveryV1({
       version: "2019-03-25",
@@ -158,6 +162,55 @@ async function main(params) {
           "Here are available specials: <br><br>" +
           response.join("\n\n"),
       };
+    } catch (err) {
+      return { error: "it failed : " + err };
+    }
+  
+  // retrieve data from DB2
+  } else if (params.type === "db2") {
+    var ibmdb = require('ibm_db');
+    dsn=params.__bx_creds[Object.keys(params.__bx_creds)[0]].dsn;
+  
+    // dsn does not exist in the DB2 credential for Standard instance. It must be built manually
+    if(!dsn) {
+      const dbname = params.__bx_creds[Object.keys(params.__bx_creds)[0]].connection.db2.database;
+      const hostname = params.__bx_creds[Object.keys(params.__bx_creds)[0]].connection.db2.hosts[0].hostname;
+      const port = params.__bx_creds[Object.keys(params.__bx_creds)[0]].connection.db2.hosts[0].port;
+      const protocol = 'TCPIP';
+      const uid = params.__bx_creds[Object.keys(params.__bx_creds)[0]].connection.db2.authentication.username;
+      const password = params.__bx_creds[Object.keys(params.__bx_creds)[0]].connection.db2.authentication.password;
+      
+      //dsn="DATABASE=;HOSTNAME=;PORT=;PROTOCOL=;UID=;PWD=;Security=SSL";
+      dsn = `DATABASE=${dbname};HOSTNAME=${hostname};PORT=${port};PROTOCOL=${protocol};UID=${uid};PWD=${password};Security=SSL`;
+      //console.log(`manually created DSN string: '' - NOTE: REMOVE THIS LOG LINE, AS IT LOGS CREDENTIALS`);
+      //console.log(dsn);
+    }
+
+    try {
+      var ibmdb = require('ibm_db');
+      var conn=ibmdb.openSync(dsn);
+      
+      // searching parameter
+      var x = params.input;
+      if (x != null && x != ""){
+        x = "%" + x + "%";
+      }else{
+          var x = "%";
+      }
+      
+      var data=conn.querySync("select SHORTNAME from prom.promotions where SHORTNAME like ?", [x]);
+
+      // format data retrieved
+      const count = data.length;
+      var i;
+      var outp = "Here are available specials: <br><br>";
+      for (i=0; i<count; i++){
+        outp += (i+1) + ") " + data[i].SHORTNAME + "<br>";
+      }
+
+      conn.closeSync();
+      return {result : outp};
+
     } catch (err) {
       return { error: "it failed : " + err };
     }
