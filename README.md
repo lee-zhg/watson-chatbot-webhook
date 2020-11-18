@@ -105,13 +105,7 @@ To configure Watson Discover service,
 1. `Run query`.
 
 
-
-
-
-
-
-
-### Step 4 - Create DB2 Service Instance - Under Construction
+### Step 5 - Create DB2 Service Instance - Under Construction
 
 1. Login to IBM Cloud in the terminal environment.
 
@@ -158,7 +152,7 @@ To configure Watson Discover service,
    ```
 
 
-### Step 5 - Configure Cloud Functions
+### Step 6 - Configure Cloud Functions
 
 IBM Cloud Functions is a distributed compute service that executes application logic in response to requests from web or mobile apps. You can set up specific actions to occur based on HTTP-based API requests from web apps or mobile apps, and from event-based requests from services like Cloudant. Functions can run your code snippets on demand or automatically in response to events.
 
@@ -175,7 +169,7 @@ To perform the registration and setup, run the command below and this will execu
 1. Configure Cloud Function
 
    ```sh
-   ./setup_cloudfunctions.sh  YOURSECRET
+   ./setup_cloudfunctions.sh  YOURSECRET "dashdb-for-transactions"
    ```
 
    > **Note**: `YOURSECRET` is a text string that helps to keep your cloud functions secure.
@@ -189,7 +183,7 @@ To perform the registration and setup, run the command below and this will execu
    Keep this information available for the next section.
 
 
-### Step 6 - Configure Webhook for Watson Assistant Service
+### Step 7 - Configure Webhook for Watson Assistant Service
 
 To configure the Watson Assistant webhook,
 
@@ -201,7 +195,7 @@ To configure the Watson Assistant webhook,
 
 1. Select the `Skills` tab in the left navigation tab.
 
-1. Select the `watson-burger-simple` skill.
+1. Select the `skill-watson-burger-webhook.json` skill.
 
 1. Select `Options` menu in the left pane.
 
@@ -218,7 +212,7 @@ To configure the Watson Assistant webhook,
 1. Enter your `YOURSECRET` which you used when create the cloud function.
 
 
-### Step 7 - Try it
+### Step 8 - Try it
 
 `Try it` feature provides a quick testing option while you develop a skill.
 
@@ -240,7 +234,7 @@ To test the chatbot via `try it` link,
 
 1. "Try it out` window open on the right. You should be familar to the chatbot UI now.
 
-#### 7.1 - Inquire Covid-19 information
+#### 8.1 - Inquire Covid-19 information
 
 1. Inquire the latest Covid-19 information by entering `latest covid-19 data`.
 
@@ -261,11 +255,15 @@ To test the chatbot via `try it` link,
    Source: Johns Hopkins CSSE
    ```
 
-#### 7.2 - Inquire Promotion Information Stored in Waston Discovery Service
+1. Configuration of the `Inquire COVID-19` node demonstrates 
+   * how to build chatbot response based on contents returned by the webhook
+   * how to retrieve external data via 3rd party API
+
+#### 8.2 - Inquire Promotion Information Stored in Waston Discovery Service
 
 1. Make a promotion inquiry by entering `any special`.
 
-1. The `Inquire promotion` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
+1. The `Inquire promotion from Discovery Service` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
 
    !["watson-burger-simple Example"](doc/images/inquire-promotion01.png)
 
@@ -293,7 +291,7 @@ To test the chatbot via `try it` link,
    Coupon Link: https://www.ibm.com 
    ```
 
-#### 7.3 - Inquire Hamburger Promotion Information Stored in Waston Discovery Service
+#### 8.3 - Inquire Hamburger Promotion Information Stored in Waston Discovery Service
 
 1. Make a promotion inquiry by entering `any special for ordering hamburger`.
 
@@ -313,9 +311,55 @@ To test the chatbot via `try it` link,
    Coupon Link: https://www.ibm.com 
    ```
 
-1. Configuration of the `Inquire promotion` node demonstrates 
+1. Configuration of the `Inquire promotion from Discovery Service` node demonstrates 
    * how to collect inquiry term via the chatbot and pass it to cloud function as parameter
    * how to build chatbot response based on contents returned by the webhook
+   * how to retrieve external data from Watson Discovery service
+
+
+#### 8.4 - Inquire Promotion Information Stored in DB2 Database
+
+1. Make a promotion inquiry by entering `any db2 special`. Intent `#inquire-db2-promotion` is configured to catch the inquiry.
+
+1. The `Inquire promotion from DB2 Database` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
+
+   !["watson-burger-simple Example"](doc/images/inquire-db2-promotion01.png)
+
+   * Watson chatbot passes `db2` as the parameter `type`, so the cloud function action makes a API call to DB2 database which returns special promotion information.
+   * The node has an optional slot. If the promotional item or term information is identified, it'll be stored in entity `@promotion_term`. Because this is an optional slot, when no promotional item or term is identified, end user won't be prompted for. In this example, `@promotion_term` contains no information as it's a general promotion inquiry. 
+   * Contents returned by the cloud function is stored in `webhook_result_3` variable.
+   * The node is configured to display `<? $webhook_result_3.result ?>` as the chatbot response.
+   * To identify what JSON elements are available in the return object, `<? $webhook_result_1 ?>` can be tested at development phase.
+
+1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+
+   ```
+   Here are available specials:
+
+   1) Free small drink with purchase of any meal
+   2) Buy one hamburger and 1/2 price for the 2nd hamburger
+   ```
+
+#### 8.5 - Inquire Hamburger Promotion Information Stored in DB2 Database
+
+1. Make a promotion inquiry by entering `any db2 special for ordering hamburger`.
+
+1. This time, the Watson assistant has two understanding
+   * `inquire_db2_promotion` as the `intent`
+   * `hamburger` in the entity `@promotion_term`
+
+1. Since the content in the entity `@promotion_term` is used in the cloud function when making inquires to DB2 database, this time the chatbot only returns the `hamburger` related promotion.
+
+   ```
+   Here are available specials:
+
+   1) Buy one hamburger and 1/2 price for the 2nd hamburger
+   ```
+
+1. Configuration of the `Inquire promotion from DB2 Database` node demonstrates 
+   * how to collect inquiry term via the chatbot and pass it to cloud function as parameter
+   * how to build chatbot response based on contents returned by the webhook
+   * how to retrieve external data from DB2 database
 
 
 ## License
