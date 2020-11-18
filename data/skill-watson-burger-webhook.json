@@ -1,0 +1,1452 @@
+{
+  "intents": [
+    {
+      "intent": "exit",
+      "examples": [
+        {
+          "text": "cancel"
+        },
+        {
+          "text": "exit"
+        },
+        {
+          "text": "get me out"
+        },
+        {
+          "text": "get me out of here"
+        },
+        {
+          "text": "I'm done"
+        },
+        {
+          "text": "no"
+        }
+      ]
+    },
+    {
+      "intent": "help",
+      "examples": [
+        {
+          "text": "help"
+        },
+        {
+          "text": "help please"
+        },
+        {
+          "text": "I don't understand"
+        },
+        {
+          "text": "What can I do"
+        }
+      ]
+    },
+    {
+      "intent": "inquire-covid-19",
+      "examples": [
+        {
+          "text": "current coronavirus status"
+        },
+        {
+          "text": "current covid-19 status"
+        },
+        {
+          "text": "last information of coronavirus"
+        },
+        {
+          "text": "latest data of covid-19"
+        },
+        {
+          "text": "What is the latest covid-19 data?"
+        },
+        {
+          "text": "what is the latest information for COVID-19?"
+        },
+        {
+          "text": "what's new regarding to coronavirus?"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "inquire-promotion",
+      "examples": [
+        {
+          "text": "any discount"
+        },
+        {
+          "text": "any promotion for burger"
+        },
+        {
+          "text": "any promotion for drink"
+        },
+        {
+          "text": "any sales for fries"
+        },
+        {
+          "text": "any special for burger"
+        },
+        {
+          "text": "any special for drink"
+        },
+        {
+          "text": "any special for fries"
+        },
+        {
+          "text": "is there any item on sale"
+        },
+        {
+          "text": "is there any promotion"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "inquire-db2-promotion",
+      "examples": [
+        {
+          "text": "any db2 discount"
+        },
+        {
+          "text": "any db2 promotion for burger"
+        },
+        {
+          "text": "any db2 promotion for drink"
+        },
+        {
+          "text": "any db2 sales for fries"
+        },
+        {
+          "text": "any db2 special for burger"
+        },
+        {
+          "text": "any db2 special for drink"
+        },
+        {
+          "text": "any db2 special for fries"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "intent": "order",
+      "examples": [
+        {
+          "text": "a big mac to go"
+        },
+        {
+          "text": "a burger please"
+        },
+        {
+          "text": "a burger to go"
+        },
+        {
+          "text": "a McFlurry please"
+        },
+        {
+          "text": "a McFlurry to go"
+        },
+        {
+          "text": "a small McFlurry for here"
+        },
+        {
+          "text": "a small McFlurry please"
+        },
+        {
+          "text": "a small McFlurry to go"
+        },
+        {
+          "text": "can I have a small McFlurry please"
+        },
+        {
+          "text": "Can I have Big Mac meal please"
+        },
+        {
+          "text": "I like to have a cheeseburger"
+        },
+        {
+          "text": "I like to order a drink"
+        },
+        {
+          "text": "I want to order a hamburger"
+        },
+        {
+          "text": "May I have a big mac, please"
+        },
+        {
+          "text": "may I have a burger, please"
+        },
+        {
+          "text": "may I have a small McFlurry please"
+        },
+        {
+          "text": "order"
+        }
+      ]
+    },
+    {
+      "intent": "reset",
+      "examples": [
+        {
+          "text": "begin"
+        },
+        {
+          "text": "delete the inputs"
+        },
+        {
+          "text": "reset"
+        },
+        {
+          "text": "restart"
+        },
+        {
+          "text": "start again"
+        },
+        {
+          "text": "start over"
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "entity": "beverage",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "coca-cola",
+          "synonyms": [
+            "coca Cola",
+            "coke"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "diet coke",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "dr depper",
+          "synonyms": [
+            "drpepper"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "fanta orange",
+          "synonyms": [
+            "fanta"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "iced tea",
+          "synonyms": [
+            "nonsweet iced tea"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "milk",
+          "synonyms": [
+            "low fat milk"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "Sprite",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "sweet ice tea",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "tropic berry",
+          "synonyms": [
+            "small mix by sprite tropic berry",
+            "tropic"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "burger",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "big mac",
+          "synonyms": [
+            "bigmac"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "cheeseburger",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "double cheeseburger",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "double quarter pounder with cheese",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "hamburger",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "mcdouble",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "qauarter pounder with cheese",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "quarter pounder with cheese bacon",
+          "synonyms": []
+        },
+        {
+          "type": "synonyms",
+          "value": "quarter pounder with cheese deluxe",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "category",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "beverage",
+          "synonyms": [
+            "bottle water",
+            "coca Cola",
+            "coca-cola",
+            "coke",
+            "diet coke",
+            "drink",
+            "dr pepper",
+            "fanta orange",
+            "iced tea",
+            "juice",
+            "milk",
+            "orange juice",
+            "Slushie",
+            "sprite",
+            "sweet tea",
+            "tea",
+            "water"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "breakfast",
+          "synonyms": [
+            "bagel",
+            "biscuit",
+            "burrito",
+            "hash brown",
+            "hotcake",
+            "mcgriddles",
+            "mcmuffin",
+            "oatmeal",
+            "sausage"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "burger",
+          "synonyms": [
+            "big mac",
+            "cheeseburger",
+            "cheese burger",
+            "deluxe",
+            "double cheeseburger",
+            "hamburger",
+            "mcdouble"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "chicken & sandwich",
+          "synonyms": [
+            "chicken mcnugget",
+            "chicken sandwich",
+            "filet-o-fish",
+            "mcchicken",
+            "mcnugget",
+            "nugget"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "meal",
+          "synonyms": [
+            "10 piece chicken mcnuggets combo",
+            "10 piece chicken mcnuggets meal",
+            "big mac combo",
+            "big mac combo meal",
+            "buttermilk crispy chicken sandwich combo",
+            "buttermilk crispy chicken sandwich meal",
+            "cheeseburger combo",
+            "cheeseburger combo meal",
+            "combo",
+            "combo meal",
+            "double Quarter pounder®* with cheese combo",
+            "double Quarter pounder®* with cheese meal",
+            "filet-o-fish® meal",
+            "quarter pounder®* with cheese combo",
+            "quarter pounder®* with cheese meal"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "shake",
+          "synonyms": [
+            "caramel sundae",
+            "chocolate shake",
+            "fudge sundae",
+            "hot caramel sundae",
+            "hot fudge sundae",
+            "ice cream",
+            "kiddie cone",
+            "mcflurry",
+            "mcflurry with m&m's candies",
+            "mcflurry with oreo",
+            "mcflurry with oreo cookies",
+            "shake",
+            "strawberry shake",
+            "sundae",
+            "vanilla cone",
+            "vanilla shake"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "extra_confirmed",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "no",
+          "synonyms": [
+            "n"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "yes",
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "entity": "mac_place",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "dine-in",
+          "synonyms": [
+            "dine in",
+            "eat in",
+            "eat there",
+            "here",
+            "restaurant",
+            "stay"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "to-go",
+          "synonyms": [
+            "go home",
+            "home",
+            "take out",
+            "to go"
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "mac_size",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "large",
+          "synonyms": [
+            "l"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "medium",
+          "synonyms": [
+            "m",
+            "regular"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "small",
+          "synonyms": [
+            "s"
+          ]
+        }
+      ]
+    },
+    {
+      "entity": "mcflurry_flavor",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "McFlurry with MM'S Candies",
+          "synonyms": [
+            "candies",
+            "candy",
+            "mm",
+            "m&m",
+            "m&m candy"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "McFlurry with OREO Cookies",
+          "synonyms": [
+            "cookies",
+            "cooky",
+            "oreo",
+            "oreo cooky"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "mcflurry_size",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "regular size",
+          "synonyms": [
+            "r",
+            "reg",
+            "regular"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "snack size",
+          "synonyms": [
+            "s",
+            "small",
+            "snack"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "promotion_term",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "drink",
+          "synonyms": [
+            "beverage",
+            "soda"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "half price",
+          "synonyms": [
+            "1/2 price"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "hamburger",
+          "synonyms": [
+            "burger"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "shakes",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "ice_cream",
+          "synonyms": [
+            "ice cream",
+            "kiddie cone",
+            "vanilla cone"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "mcflurry",
+          "synonyms": [
+            "mcflurry with m&m",
+            "mcflurry with m&m's candies",
+            "mcflurry with oreo",
+            "mcflurry with oreo cookies"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "shake",
+          "synonyms": [
+            "chocolate",
+            "chocolate shake",
+            "strawberry shake",
+            "strawberryy",
+            "vanilla",
+            "vanilla shake"
+          ]
+        },
+        {
+          "type": "synonyms",
+          "value": "sundae",
+          "synonyms": [
+            "caramel",
+            "fudge",
+            "fudge sundae",
+            "hot caramel",
+            "hot caramel sundae",
+            "hot fudge sundae"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    }
+  ],
+  "metadata": {
+    "api_version": {
+      "major_version": "v2",
+      "minor_version": "2018-11-08"
+    }
+  },
+  "webhooks": [
+    {
+      "url": "https://us-south.functions.appdomain.cloud/api/v1/web/f426fa7a-3320-47cd-9a6e-cf0ae6e22890/chatbot-promotion-pkg/controller.json",
+      "name": "main_webhook",
+      "headers": [
+        {
+          "name": "X-Require-Whisk-Auth",
+          "value": "YOURSECRET"
+        }
+      ]
+    }
+  ],
+  "dialog_nodes": [
+    {
+      "type": "standard",
+      "title": "Fallback",
+      "output": {
+        "text": {
+          "values": [
+            "You can order burgers, drinks and shakes. You can extend this demo chatbot to include other items."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "metadata": {},
+      "conditions": "anything_else",
+      "digress_in": "not_available",
+      "dialog_node": "Fallback",
+      "digress_out": "allow_all",
+      "previous_sibling": "node_3_1602871215441"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_99_1597249758987",
+      "context": {
+        "mac_place": "@mac_place"
+      },
+      "conditions": "@mac_place",
+      "event_name": "input",
+      "dialog_node": "handler_100_1597249758987"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Dine in or to go?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_99_1597249758987",
+      "event_name": "focus",
+      "dialog_node": "handler_101_1597249758987",
+      "previous_sibling": "handler_100_1597249758987"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "generic": []
+      },
+      "parent": "mac ordering",
+      "metadata": {},
+      "conditions": "#help",
+      "event_name": "generic",
+      "dialog_node": "handler_10_1500495433159"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_2_1597248236565",
+      "context": {
+        "mac_mcflurry_size": "@mcflurry_size"
+      },
+      "conditions": "@mcflurry_size",
+      "event_name": "input",
+      "dialog_node": "handler_10_1597248236569"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "You can choose Sundae, Shake or ice cream? Select dine-in or to go."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_95_1597249758984",
+      "metadata": {},
+      "conditions": "#help",
+      "event_name": "generic",
+      "dialog_node": "handler_102_1597249758987"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_10_1602871822739",
+      "event_name": "focus",
+      "dialog_node": "handler_1_1602871822759",
+      "previous_sibling": "handler_6_1602871822759"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_18_1597242570911",
+      "context": {
+        "mac_place": "@mac_place"
+      },
+      "conditions": "@mac_place",
+      "event_name": "input",
+      "dialog_node": "handler_19_1597242570911"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Is this for dine in or to go?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_18_1597242570911",
+      "event_name": "focus",
+      "dialog_node": "handler_20_1597242570911",
+      "previous_sibling": "handler_19_1597242570911"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "You can choose type of burgers, and dine-in or dine-out"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_1_1597242570861",
+      "metadata": {},
+      "conditions": "#help",
+      "event_name": "generic",
+      "dialog_node": "handler_21_1597242570911"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_1_1597255411569",
+      "context": {
+        "mac_mcflurry_flavor": "@mcflurry_flavor"
+      },
+      "conditions": "@mcflurry_flavor",
+      "event_name": "input",
+      "dialog_node": "handler_3_1597255411572"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "What type of burger do you want (big mac, cheeseburger, double cheeseburger and etc)?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_3_1597242570910",
+      "event_name": "focus",
+      "dialog_node": "handler_4_1597242570910"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Do you like to have \"McFlurry with MM'S Candies\" or \"McFlurry with OREO Cookies\""
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_1_1597255411569",
+      "event_name": "focus",
+      "dialog_node": "handler_4_1597255411572",
+      "previous_sibling": "handler_3_1597255411572"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_6_1599581835996",
+      "context": {
+        "mac_burger_size": "@mac_size"
+      },
+      "conditions": "@mac_size",
+      "event_name": "input",
+      "dialog_node": "handler_4_1599581836010"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_3_1597242570910",
+      "context": {
+        "mac_burger": "@burger"
+      },
+      "conditions": "@burger",
+      "event_name": "input",
+      "dialog_node": "handler_5_1597242570910",
+      "previous_sibling": "handler_4_1597242570910"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Is this regular size or snack size?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_2_1597248236565",
+      "event_name": "focus",
+      "dialog_node": "handler_5_1597248236569",
+      "previous_sibling": "handler_10_1597248236569"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_10_1602871822739",
+      "context": {
+        "promotion_term": "@promotion_term"
+      },
+      "conditions": "@promotion_term",
+      "event_name": "input",
+      "dialog_node": "handler_6_1602871822759"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Please select your burger size (large, medium or small)"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_6_1599581835996",
+      "event_name": "focus",
+      "dialog_node": "handler_7_1599581836010",
+      "previous_sibling": "handler_4_1599581836010"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "You can choose \"McFlurry with MM'S Candies\" or \"McFlurry with OREO Cookies\".  Select regular size or snack size."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_68_1597244823140",
+      "metadata": {},
+      "conditions": "#help",
+      "event_name": "generic",
+      "dialog_node": "handler_75_1597244823143"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "What type of drink do you like? Coke, Sprite, Dr Pepper, Ice Tea and etc"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_78_1597246060421",
+      "event_name": "focus",
+      "dialog_node": "handler_79_1597246060421"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_78_1597246060421",
+      "context": {
+        "mac_beverage": "@beverage"
+      },
+      "conditions": "@beverage",
+      "event_name": "input",
+      "dialog_node": "handler_80_1597246060421",
+      "previous_sibling": "handler_79_1597246060421"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_81_1597246060421",
+      "context": {
+        "mac_size": "@mac_size"
+      },
+      "conditions": "@mac_size",
+      "event_name": "input",
+      "dialog_node": "handler_82_1597246060421"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "Large, Medium or Small?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_81_1597246060421",
+      "event_name": "focus",
+      "dialog_node": "handler_83_1597246060421",
+      "previous_sibling": "handler_82_1597246060421"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "You can choose size from small, medium, large"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_77_1597246060416",
+      "metadata": {},
+      "conditions": "#help",
+      "event_name": "generic",
+      "dialog_node": "handler_84_1597246060421"
+    },
+    {
+      "type": "event_handler",
+      "output": {
+        "text": {
+          "values": [
+            "What do you like?  McFlurry, Sundae, Shake or ice cream?"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "slot_96_1597249758987",
+      "event_name": "focus",
+      "dialog_node": "handler_97_1597249758987"
+    },
+    {
+      "type": "event_handler",
+      "output": {},
+      "parent": "slot_96_1597249758987",
+      "context": {
+        "mac_shake": "@shakes"
+      },
+      "conditions": "@shakes",
+      "event_name": "input",
+      "dialog_node": "handler_98_1597249758987",
+      "previous_sibling": "handler_97_1597249758987"
+    },
+    {
+      "type": "frame",
+      "title": "Order",
+      "output": {},
+      "metadata": {
+        "fallback": "leave"
+      },
+      "next_step": {
+        "behavior": "skip_user_input"
+      },
+      "conditions": "#order",
+      "digress_in": "does_not_return",
+      "dialog_node": "mac ordering",
+      "digress_out": "allow_all",
+      "previous_sibling": "Welcome",
+      "digress_out_slots": "allow_all"
+    },
+    {
+      "type": "frame",
+      "title": "order burger",
+      "output": {},
+      "parent": "mac ordering",
+      "metadata": {
+        "fallback": "leave"
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#order && @category:burger",
+      "dialog_node": "node_1_1597242570861",
+      "previous_sibling": "handler_10_1500495433159"
+    },
+    {
+      "type": "standard",
+      "title": "Inquire COVID-19",
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "type": "api"
+          },
+          "result_variable": "webhook_result_2"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#inquire-covid-19",
+      "digress_in": "does_not_return",
+      "dialog_node": "node_3_1602871215441",
+      "previous_sibling": "node_5_1602810148128"
+    },
+    {
+      "type": "frame",
+      "title": "Inquire promotion",
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "type": "discovery",
+            "input": "@promotion_term"
+          },
+          "result_variable": "webhook_result_1"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#inquire-promotion",
+      "digress_in": "does_not_return",
+      "dialog_node": "node_5_1602810148128",
+      "previous_sibling": "Reset"
+    },
+    {
+      "type": "frame",
+      "title": "order McFlurry",
+      "output": {},
+      "parent": "mac ordering",
+      "metadata": {
+        "fallback": "leave"
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#order && @category:shake && @shakes:mcflurry",
+      "dialog_node": "node_68_1597244823140",
+      "previous_sibling": "node_77_1597246060416"
+    },
+    {
+      "type": "standard",
+      "title": "else",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "The chatbot is not trained to take this order"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "mac ordering",
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#order",
+      "dialog_node": "node_7_1597251922348",
+      "previous_sibling": "node_95_1597249758984"
+    },
+    {
+      "type": "frame",
+      "title": "order beverage",
+      "output": {},
+      "parent": "mac ordering",
+      "metadata": {
+        "fallback": "leave"
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#order && @category:beverage",
+      "dialog_node": "node_77_1597246060416",
+      "previous_sibling": "node_1_1597242570861"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "Thank you for your ordering."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "mac ordering",
+      "dialog_node": "node_8_1494705793073",
+      "previous_sibling": "node_7_1597251922348"
+    },
+    {
+      "type": "frame",
+      "title": "order shake",
+      "output": {},
+      "parent": "mac ordering",
+      "metadata": {
+        "fallback": "leave"
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Reset"
+      },
+      "conditions": "#order && @category:shake",
+      "dialog_node": "node_95_1597249758984",
+      "previous_sibling": "node_68_1597244823140"
+    },
+    {
+      "type": "standard",
+      "title": "Reset",
+      "output": {
+        "text": {
+          "values": [
+            "......"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "context": {
+        "mac_size": null,
+        "mac_type": null,
+        "mac_place": null,
+        "mac_shake": null,
+        "mac_burger": null,
+        "mac_beverage": null,
+        "promotion_term": null,
+        "mac_mcflurry_size": null,
+        "mac_mcflurry_flavor": null
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "body",
+        "dialog_node": "Welcome"
+      },
+      "conditions": "#reset",
+      "dialog_node": "Reset",
+      "previous_sibling": "mac ordering"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "<? $webhook_result_1.result ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_5_1602810148128",
+      "conditions": "$webhook_result_1",
+      "dialog_node": "response_2_1602810219813",
+      "previous_sibling": "slot_10_1602871822739"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "Enjoy your $mac_burger. We are preparing your  $mac_place order"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_1_1597242570861",
+      "conditions": "$mac_burger &&  $mac_place",
+      "dialog_node": "response_22_1597242570911",
+      "previous_sibling": "handler_21_1597242570911"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Enjoy your  $mac_place order, $mac_shake"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_95_1597249758984",
+      "conditions": "$mac_shake && $mac_place",
+      "dialog_node": "response_3_1597249894035",
+      "previous_sibling": "handler_102_1597249758987"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Enjoy your $mac_size $mac_beverage."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_77_1597246060416",
+      "conditions": "$mac_beverage && $mac_size",
+      "dialog_node": "response_5_1597249526270",
+      "previous_sibling": "handler_84_1597246060421"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Enjoy your $mac_mcflurry_size $mac_mcflurry_flavor"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_68_1597244823140",
+      "conditions": "$mac_mcflurry_flavor && $mac_mcflurry_size",
+      "dialog_node": "response_5_1597255908292",
+      "previous_sibling": "handler_75_1597244823143"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "text": {
+          "values": [
+            "no special was found"
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "parent": "node_5_1602810148128",
+      "conditions": "anything_else",
+      "dialog_node": "response_7_1602810220810",
+      "previous_sibling": "response_2_1602810219813"
+    },
+    {
+      "type": "response_condition",
+      "parent": "node_3_1602871215441",
+      "conditions": "anything_else",
+      "dialog_node": "response_7_1602871289969",
+      "previous_sibling": "response_8_1602871288755"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "<? $webhook_result_2.result ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_3_1602871215441",
+      "conditions": "$webhook_result_2",
+      "dialog_node": "response_8_1602871288755"
+    },
+    {
+      "type": "slot",
+      "parent": "node_5_1602810148128",
+      "variable": "$promotion_term",
+      "dialog_node": "slot_10_1602871822739"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_68_1597244823140",
+      "variable": "$mac_mcflurry_flavor",
+      "dialog_node": "slot_1_1597255411569",
+      "previous_sibling": "response_5_1597255908292"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_1_1597242570861",
+      "variable": "$mac_place",
+      "dialog_node": "slot_18_1597242570911",
+      "previous_sibling": "slot_6_1599581835996"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_68_1597244823140",
+      "variable": "$mac_mcflurry_size",
+      "dialog_node": "slot_2_1597248236565",
+      "previous_sibling": "slot_1_1597255411569"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_1_1597242570861",
+      "variable": "$mac_burger",
+      "dialog_node": "slot_3_1597242570910",
+      "previous_sibling": "response_22_1597242570911"
+    },
+    {
+      "type": "slot",
+      "parent": "node_1_1597242570861",
+      "variable": "$mac_burger_size",
+      "dialog_node": "slot_6_1599581835996",
+      "previous_sibling": "slot_3_1597242570910"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_77_1597246060416",
+      "variable": "$mac_beverage",
+      "dialog_node": "slot_78_1597246060421",
+      "previous_sibling": "response_5_1597249526270"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_77_1597246060416",
+      "variable": "$mac_size",
+      "dialog_node": "slot_81_1597246060421",
+      "previous_sibling": "slot_78_1597246060421"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_95_1597249758984",
+      "variable": "$mac_shake",
+      "dialog_node": "slot_96_1597249758987",
+      "previous_sibling": "response_3_1597249894035"
+    },
+    {
+      "type": "slot",
+      "output": {},
+      "parent": "node_95_1597249758984",
+      "variable": "$mac_place",
+      "dialog_node": "slot_99_1597249758987",
+      "previous_sibling": "slot_96_1597249758987"
+    },
+    {
+      "type": "standard",
+      "title": "Welcome",
+      "output": {
+        "text": {
+          "values": [
+            "Welcome to basic burger chatbot demonstration, you can order burgers, drinks and shakes from menu. Ask for Help if needed."
+          ],
+          "selection_policy": "sequential"
+        }
+      },
+      "conditions": "welcome",
+      "dialog_node": "Welcome"
+    }
+  ],
+  "counterexamples": [],
+  "learning_opt_out": false,
+  "name": "watson-burger-webhook",
+  "language": "en",
+  "description": "Basic restaurant ordering chatbot ordering burgers, drinks and shakes"
+}
