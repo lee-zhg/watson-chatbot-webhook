@@ -1,387 +1,596 @@
-# Watson Chatbot Webhook - Know what is on sales before ordering
+# Add Multi-languages Support to Watson Chatbot
 
-In this tutorial, you are going to enhence the [Basic Burger Ordering Chatbot with Watson Assistant Service](https://github.com/lee-zhg/watson-chatbot-simple.git). You'll configure the chatbot to provide promotion information. 
+In this repo, you learn how to add multi-languages support to your Watson Assistant chatbot. You learn how to develop, deploy and configure pre-Webhook and post-Webhook of Watson Assistant.
 
-Because the promotion information is very dynamic and changes frequently over time, it may not be practical to embed it as part of the chatbot. Promotion information can be stored externally, such as in a database or Watson Discovery. In this repo, you are going to enhence the chatbot to retrieve and communicate the promotion information stored in a DB2 database and/or Watson Discovery service.
+There are many ways to add multi-languages capability when developing a Watson Assistant chatbot. Mitchell Mason wrote a great blog on the subject at [The Watson Assistant Guide to Multilingual Chatbots](https://medium.com/ibm-watson/the-watson-assistant-guide-to-multilingual-chatbots-186aaf5e99ae).
 
-!["Architecture"](doc/images/architecture03.png)
+For simplicity and portability, this repo implements the `Full Machine Translation` option. 
 
-This repo is part of Watson chatbot serial. The entire serial includes
-* [Simple ChatBot](https://github.com/lee-zhg/watson-chatbot-simple.git)
-* [Dressed-up ChatBot](https://github.com/lee-zhg/watson-chatbot-advanced.git)
-* [Voice-Enabled ChatBot](https://github.com/lee-zhg/watson-voice-enabled-chatbot.git)
-* [VoiceBot – Call and speak to ChatBot](https://github.com/lee-zhg/watson-voicebot.git) 
+The flow is simple: a user sends a message to Watson and Watson sends a response back. We’ll use the pre- and post-message webhooks to intercept and translate in between.
 
-> **NOTE**: Watson Assistant service is available in IBM Cloud as well as part of IBM Cloud pak for Data. As the result, you can deploy and run your chatbot in public cloud, private cloud, hybird cloud and on-prem.
+!["watson-assistant-multi-language-architecture"](docs/images/architecture01.png)
 
-> Click [here](https://www.ibm.com/products/cloud-pak-for-data) for more information about IBM Cloud Pak for Data.
+Data flow:
+1. Take the user’s message
+1. Identify the language in the message with the Language Translator `Language Identification` endpoint, and then translate the message to the language of the assistant
+1. Get the response from Watson
+1. Translate it back to the user’s language based on context set in step 2
+1. Send response user.
 
-Adopted from IBM code pattern [Build a database-driven Slackbot](https://github.com/IBM-Cloud/slack-chatbot-database-watson) and [COVID Crisis Communications Starter Kit](https://github.com/lee-zhg/Solution-Starter-Kit-Communication-2020).
 
+## Steps
 
-## Use Case Flow
+Complete procedures in this section to add generic and portable multi-languages capability to a Watson Assistant chatbot by implementing the `Full Machine Translation` option.
 
-1. User sends messages to the application (running locally or on IBM Cloud).
-2. The application sends the user message to IBM Watson Assistant service, and displays the ongoing chat in a web page.
-3. Watson Assistant uses the NLU and NLP to understand and fulfill your order, and sends requests for additional information back to the running application. Watson Assistant can be provisioned on either IBM Cloud or IBM Cloud Pak for Data.
-4. Watson Assistant useds `web hook` to retrieve sales information dynamically from external sources such as DB2 database and Watson Discovery service.
+There are many ways to support multi-languages capability in Watson Assistant chatbot. Depending on your specific use cases, the options may perform differently. The `Full Machine Translation` method is a generic, portable option. Because it provides an universal catching-all multi-languages capability, other implementation options may offer a more accurate solution in certain specific use cases.
 
 
-## Included Components
+### Step 1 - Clone the Repository
 
-* [IBM Watson Assistant](https://www.ibm.com/cloud/watson-assistant/): Build, test and deploy a bot or virtual agent across mobile devices, messaging platforms, or even on a physical robot.
-* [IBM Watson DB2](https://cloud.ibm.com/catalog/services/db2): A fully managed, high-performant relational data store running the enterprise-class DB2 database engine.
-* [IBM Watson Disacovery](https://cloud.ibm.com/catalog/services/discovery): Add a cognitive search and content analytics engine to applications.
+Before you deploy your code as a service in IBM Cloud Function, clone the repo locally.
 
+1. Login to IBM Cloud in a browser.
 
-## Exercise Flow
+1. Open the `IBM Cloud Shell`. The `IBM Cloud Shell` is opened in a separate tab.
 
-### Step 1 - Clone the repo
+1. Since you were authenticated when you logined to the IBM Cloud, you are automatically autenticated in the `IBM Cloud Shell`.
 
-To clone `watson-chatbot-webhook` locally in a terminal, run:
+1. Clone the repo.
 
-```
-$ git clone https://github.com/lee-zhg/watson-chatbot-webhook.git
+    ```
+    git clone https://github.com/lee-zhg/watson-chatbot-pre-post-webhook
+    ```
 
-$ cd watson-chatbot-webhook
-```
+1. Navigate to the repo folder.
 
-We’ll be using the file [`data/skill-watson-burger-simple.json`](data/skill-watson-burger-advanced.json) to upload the Assistant Intents, Entities, and Dialog Nodes.
+    ```
+    cd watson-chatbot-pre-post-webhook/
+    ```
 
 
-### Step 2 - Create Watson Assistant Service
+### Step 2 - Pre-Webhook
 
-If you have completed the exercise of [Basic Burger Ordering Chatbot with Watson Assistant Service](https://github.com/lee-zhg/watson-chatbot-simple.git), you should have created a `Watson Assistant` service instance in IBM Cloud. You may re-use the sample instance for the exercise in this repo.
+The following tasks complete the Watson Assistant pre-webhook deployment and configuration.
+* Develop source code that holds the translation logic.
+* Deploy the above application as a microservice. In this repo, the service is deployed as a IBM Cloud Function in IBM Cloud.
+* Configure Watson Assistant pre-webhook to apply the language translation logic to the chatbot.
 
-In case you don't have a `Watson Assistant` service instance in IBM Cloud, create one and name it `burger-asssistant-service`:
 
-* [**Watson Assistant**](https://cloud.ibm.com/catalog/services/conversation)
+#### Step 2.1 - Develop Source Code for Translation Logic
 
+Sample code `preMessageTranslate.js` offers a starting point. It locates in the root folder of this repo.
 
-### Step 3 - Create Watson Discovery Service
+The sample code helps you create a service running synchronisely to 
+ * identify the language ID of the input phrase if necessary
+ * store the identified language ID for the reference during the remaining chat session
+ * translate the input phrase to the desired language
 
-If you don't have a `Watson Discovery` service instance in IBM Cloud, create one and name it `burger-discovery-service`:
+The application running as the Watson Assistant pre-webhook. It 
+ * intercepts the in-coming payload from chatbot end user
+ * performs its language translation logic and manipulates the payload
+ * passes the payload to the Watson Assistant
+  
+The payload is a JSON object. A sample payload can be found in file `./data/sample_pre_payload.json`.
 
-* [**Watson Discovery**](https://cloud.ibm.com/catalog/services/discovery)
+> Note: an instance of Watson Translator service is required for the sample code to work. Lite version (free version) of Watson Translator service is available with your IBM Cloud account.
 
-Take notes of 
-   * API key
-   * URL
+> Note: to debug in IBM Cloud Function, you likely need an instance of `IBM Log Analysis with LogDNA`. 
 
-!["Discovery API key and URL"](doc/images/discovery01.png)
 
+#### Step 2.2 - Deploy a Service as IBM Cloud Function
 
-### Step 4 - Configure Watson Discovery Service
+It's easy and economical to deploy a microservice as a IBM Cloud Function. In this repo, the language translation microservice is deployed as a IBM Cloud Function.
 
-To configure Watson Discover service,
+Alternatively, you may choose deploying the service to different platform such as Cloud Foundry, Kubernetes cluster, OpenShift cluster and etc. 
 
-1. Select `Launch Watson Discovery` button from your instance of Watson Discovery service.
 
-1. Select `Upload your own data` link.
+##### Step 2.2.1 - Deploy Cloud Function
 
-1. Select a plan if prompted.
+In this section, you deploy your code as a service in IBM Cloud Function. Because the Cloud Functions is not the focus of the repo, basic CLI commands are used to show the procedure.
 
-1. Give a unique `collection name`, for example, "onsales". And `Create`.
+1. Login to IBM Cloud in a browser.
 
-1. Click `select documents` link.
+1. Open the `IBM Cloud Shell`. The `IBM Cloud Shell` is opened in a separate tab.
 
-1. Select `data/promotion001.json` and `data/promotion002.json` files in the cloned repository folder. Then, `Open`.
+1. Since you were authenticated when you logined to the IBM Cloud, you are automatically autenticated in the `IBM Cloud Shell`.
 
-   !["Discovery"](doc/images/discovery02.png)
+1. Target a resource group by executing
 
-1. Click `View API detail`.
+    ```
+    ibmcloud target -g Default
+    ```
 
-1. Take note of information
-   - Collection ID
-   - Configuration ID
-   - Environment ID
+    > Note: you may use a different resource group in your account.
 
-1. Select `Build quries` link in the left pane.
+1. Create a Cloud Function Namespace. Execute
 
-1. Select `Search for documents` link to extend.
+    ```
+    ibmcloud fn namespace create team1a-ns-<your initial> --description "namespace for team1a"
+    ```
 
-1. To verify the configuration and file loading, enter `half price` under `Use natural language`.
+1. Verify the new namespace was created.
 
-1. `Run query`.
+    ```
+    ibmcloud fn namespace list 
+    ```
 
+1. Set the new namespace as default
 
-### Step 5 - Create DB2 Service Instance - Under Construction
+    ```
+    ibmcloud fn property set --namespace team1a-ns-<your initial>
+    ```
 
-1. Login to IBM Cloud in the terminal environment.
+1. Create package
 
-   ```
-   ibmcloud login 
-   ```
+    ```
+    ibmcloud fn package create multi-language-pkg-<your initial>
+    ```
 
-   or
+1. Create action for setup using Node.js environment
 
-   ```
-   ibmcloud login --sso
-   ```
+    ```
+    ibmcloud  fn  action  create  multi-language-pkg-<your initial>/preMessageTranslate  preMessageTranslate.js  --kind nodejs:12  --web  true  --web-secure  <YOURSECRET>
+    ```
 
-1. List your available resource groups.
+    > Note: <YOURSECRET> can be any text string that helps to keep your cloud functions secure. Note down <YOURSECRET> for future reference.
 
-   ```
-   ibmcloud resource groups
-   ```
+Alternatively, you may also deploy the Cloud Function via IBM Cloud UI.
 
-1. Target the resource group where the `Cloud Function` will be configured.
 
-   ```sh
-   ibmcloud target -g RESOURCE_GROUP
-   ```
-   For example, top use the `default` resource group
+##### Step 2.2.2 - Gather Cloud Function Information
 
-   ```
-   ibmcloud target -g default
-   ```
+When you configure the Pre-webhook for your Watson Assistant instance, you need couple of you cloud function information.
 
-1. Create a DB2 service instance in IBM Cloud of **us-south** region. And name it **promotionDB**.
+1. Login to IBM Cloud
 
-   ```sh
-   ibmcloud resource service-instance-create promotionDB dashdb-for-transactions free us-south
-   ```
-   {: pre}
-   
-   The `Lite(free)` plan is not available in all locations. Other plan is available.
+1. Select the main `Navigation Menu` (often referred as Hamburge menu) at the top-left corner.
 
-1. To access the database service from Cloud Functions later on, you need the authorization. Thus, you create service credentials and label them **promotion**.
+1. Select the `Functions` and then `Actions`.
 
-   ```sh
-   ibmcloud resource service-key-create promotion Manager --instance-name promotionDB
-   ```
+    !["watson-assistant-multi-language-architecture"](docs/images/cloudfunction01.png)
 
+1. Select `preMessageTranslate` entry.
 
-### Step 6 - Configure Cloud Functions
+1. Navigate to `Endpoints` in the left navigation pane.
 
-IBM Cloud Functions is a distributed compute service that executes application logic in response to requests from web or mobile apps. You can set up specific actions to occur based on HTTP-based API requests from web apps or mobile apps, and from event-based requests from services like Cloudant. Functions can run your code snippets on demand or automatically in response to events.
+    !["watson-assistant-multi-language-architecture"](docs/images/cloudfunction02.png)
 
-With IBM Cloud™ Functions, you can use your favorite programming language to write lightweight code that runs app logic in a scalable way. The Function-as-a-Service (FaaS) programming platform is based on the open source project Apache OpenWhisk.
+1. Collect URL of `HTTP Method` under `Web Action`.
 
-In this section, you are going to register actions for Cloud Functions and bind service credentials to those actions. The Cloud Functions will be triigered by the Watson chatbot and search for on-sales information stored in DB2 database of IBM Cloud and Watson Discovery service. 
+1. Collect username and password when `non-IAM` authentication is used. This occurs for the `cloud foundry` name space.
 
-Because the Cloud Functions is not the focus of the repo, scripts are provided to automate the Cloud Functions configuration. In addition to be used by the Watson chatbot webhook, the Cloud Functions is also configured for the environment preparation.
+    a) Copy the CURL command at the bottom. It should look like
 
-To perform the registration and setup, run the command below and this will execute the **setup_cloudfunctions.sh** script. If your system does not support shell commands, copy each line out of the file **setup_cloudfunctions.sh** and execute it individually.
+    ```
+    curl -u 6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2 -X POST https://us-south.functions.cloud.ibm.com/api/v1/namespaces/SL2272168_dev/actions/multi-language-pkg/postMessageTranslate?blocking=true
+    ```
+    b) The authentication credential to access the cloud function is embedded as part of the command. In this example, `6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2` is the username and password. 
 
-1. Update file `controller_parameters.json`.
+    > Note: `6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2` is for illustration purpose. It's not valid credential.
 
-1. Configure Cloud Function
+    c) Take note of the credential.
 
-   ```sh
-   ./setup_cloudfunctions.sh  YOURSECRET "dashdb-for-transactions"
-   ```
 
-   > **Note**: `YOURSECRET` is a text string that helps to keep your cloud functions secure.
+#### Step 2.3 - Configure Pre-Webhook of Watson Assistant Service
 
-1.  Obtain the URI for the deployed **controller** action.
+Now, you have deployed a service to IBM Cloud Function. Whenever you call the service, the cloud function fires up.
 
-   ```sh
-   ibmcloud fn action get chatbot-promotion-pkg/controller --url
-   ```
+To configure the pre-webhook of Watson Assistant instance,
 
-   Keep this information available for the next section.
+1. Login to IBM Cloud.
 
+1. Locate and open the Watson Assistant instance.
 
-### Step 7 - Configure Webhook for Watson Assistant Service
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
 
-To configure the Watson Assistant webhook,
+1. Develop or import a skill. Couple of sample skills are available in the `/data` folder. 
 
-1. Login to [IBM Cloud](https://cloud.ibm.com).
+    > Note: you may use your existing skill.
 
-1. On the dashboard, find and open your `Watson Assistant` service instance.
+1. For the rest of this repo, a skill `photo-shop` based on sample `skill-watson-photo.json` will be used for discussion.
 
-1. Click `Launch Watson Assistant` on the `Manage` tab.
+1. Create an `Assistant` on the `Assistant` tab. Name it `photo-shop-assistant-<your initial>`.
 
-1. Select the `Skills` tab in the left navigation tab.
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant01.png)
 
-1. Select the `skill-watson-burger-webhook.json` skill.
+    > Note: you may use your existing assistant.
 
-1. Select `Options` menu in the left pane.
+1. Add the skill `photo-shop` to the assistant.
 
-1. Select `Webhooks` option.
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant02.png)
 
-1. In `URL` field, enter the url value returned by the command `ibmcloud fn action get chatbot-promotion-pkg/controller --url` in the previous section. Make sure to add a .json at the end of the URL to indicate that JSON data should be returned. The change is automatically saved when you tab out the field.
+    > Note: if you use your existing skill and assistant, you may skip the step.
 
-   >**Note**: Make sure to add a .json at the end of the URL to indicate that JSON data should be returned. 
+1. Click the 3 dots at the top-right corner and select `Assistant settings`.
 
-1. Click `Add header` link.
+1. In the left navigation, select `Webhooks` and then `Pre-message webhook`.
 
-1. Enter `X-Require-Whisk-Auth` in the `Header name` field.
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant05.png)
 
-1. Enter your `YOURSECRET` which you used when create the cloud function.
+1. Enable the pre-webhook.
 
+1. Enable `Return an error to the client if the webhook call fails` option. When the option is disabled, its label shows `Continue processing user input without webhook update if there is an error`. 
 
-### Step 8 - Try it
+    > Note: you should consider to turn on the option initially while you test the post-webhook. It can help you identify any post-webhook related problem. After the pre-webhook works stably, you may evaluate your use case and determine how the option should be set.
 
-`Try it` feature provides a quick testing option while you develop a skill.
+1. In the URL field, copy and paste the `HTTP URL` of the cloud function for the pre-webhook.
 
-!["watson-burger-simple Example"](doc/images/try_it01.png)
+1. Add `.json` extension at the end of the URL to indicate that JSON data should be returned.
 
-To test the chatbot via `try it` link,
+1. In the `Secret` field, enter the same `<YOURSECRET>` that was used when you deployed the cloud function. 
 
-1. Login to [IBM Cloud](https://cloud.ibm.com).
+    > Note: If you did not specify its secret when deploying the cloud function, you may enter any string here.
 
-1. On the dashboard, find and open your `Watson Assistant` service instance.
+1. Enter header information of the pre-webhook.
 
-1. Click `Launch Watson Assistant` on the `Manage` tab.
+    a) Select `Add header` link.
+    
+    b) Enter `Content-Type` in the `Header name` field.
+    
+    c) Enter `application/json` in the `Header value` field.
 
-1. Select the `Skills` tab in the left navigation tab.
+    d) Tab out the field. This saves the pre-webhook configuration changes.    
+    
+1. Enter header information for authenticating the pre-webhook.
 
-1. Select `watson-burger-simple` tile to open it.
+    For `IAM` authentication (used by `non-cloud foundry` name space in IBM Cloud Function),
 
-1. Click `Try it` link.
+    a) Select `Add header` link again.
+    
+    b) Enter `X-Require-Whisk-Auth` in the `Header name` field.
+    
+    c) Enter the same `<YOURSECRET>` (that was used when you deployed the cloud function) in the `Header value` field.
 
-1. "Try it out` window open on the right. You should be familar to the chatbot UI now.
+    d) Tab out the field. This saves the pre-webhook configuration changes.    
 
-#### 8.1 - Inquire Covid-19 information
+    For `non-IAM` authentication (userid and password) (used by `cloud foundry` name space in IBM Cloud Function),
 
-1. Inquire the latest Covid-19 information by entering `latest covid-19 data`.
+    a) Select `Add header` link again.
 
-1. The `Inquire COVID-19` node understands the `intent` and trigger a Cloud Functions action running in IBM Cloud. 
+    b) Enter `Authorization` as the header name.
 
-   !["watson-burger-simple Example"](doc/images/inquire-covid-19-01.png)
+    c) User name and Password are prompted in a popup window.
+    
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant04.png)
 
-   * Watson chatbot passes `api` as the parameter `type`, so the cloud function action makes a API call to inquire the latest data of COVID-19.
-   * Contents returned by the cloud function is stored in `webhook_result_2` variable.
-   * The node is configured to display `<? $webhook_result_2.result ?>` as the chatbot response.
+    > Note: in case the pop-up is not opened, you may click the `gear` icon to the right of the fields to manually open it.
 
-1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+    d) Enter user name and password for the pre-webhook cloud function. 
+    
+    e) `Save`. The user name and password are encoded before they are stored.
 
-   ```
-   Total Cases: 38911224
-   Total Deaths: 1098181
-   Total Recovered: 26879578
-   Source: Johns Hopkins CSSE
-   ```
+    > Note: this repo uses `Secret` for authentication. The step above is for reference only.
 
-1. Configuration of the `Inquire COVID-19` node demonstrates 
-   * how to build chatbot response based on contents returned by the webhook
-   * how to retrieve external data via 3rd party API
 
-#### 8.2 - Inquire Promotion Information Stored in Waston Discovery Service
+### Step 3 - Post-Webhook
 
-1. Make a promotion inquiry by entering `any special`.
+The following tasks complete the Watson Assistant post-webhook deployment and configuration.
+* Develop source code that holds the translation logic.
+* Deploy the above application as a microservice. Cloud Function in IBM Cloud is used for this repo.
+* Configure Watson Assistant post-webhook to apply the language translation logic to the chatbot.
 
-1. The `Inquire promotion from Discovery Service` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
 
-   !["watson-burger-simple Example"](doc/images/inquire-promotion01.png)
+#### Step 3.1 - Develop Source Code for Translation Logic
 
-   * Watson chatbot passes `discovery` as the parameter `type`, so the cloud function action makes a API call to Watson Discovery service which returns special promotion information.
-   * The node has an optional slot. If the promotional item or term information is identified, it'll be stored in entity `@promotion_term`. Because this is an optional slot, when no promotional item or term is identified, end user won't be prompted for. In this example, `@promotion_term` contains no information as it's a general promotion inquiry. 
-   * Contents returned by the cloud function is stored in `webhook_result_1` variable.
-   * The node is configured to display `<? $webhook_result_1.result ?>` as the chatbot response.
-   * To identify what JSON elements are available in the return object, `<? $webhook_result_1 ?>` can be tested at development phase.
+Sample code `postMessageTranslate.js` offers a starting point. It locates in the root folder of this repo.
 
-1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+The sample code helps you create a service running synchronisely to 
+ * identify the language ID of the input phrase if necessary
+ * store the identified language ID for the reference during the remaining chat session
+ * translate the input phrase to the desired language
 
-   ```
-   Here are available specials: 
+The application running as the Watson Assistant post-webhook. It
+ * intercepts the out-going payload from Watson Assistant
+ * performs its language translation logic and manipulates the payload
+ * passes the payload to chatbot end user
+  
+The payload is a JSON object. A sample payload can be found in file `./data/sample_post_payload.json`.
 
-   Promotion: Free small drink with purchase of any meal,
-   Promotion Location: US,
-   Start Date: 2020-10-01 00:00:00
-   End Date: 2020-12-31 23:59:00
-   Coupon Link: https://www.ibm.com/events/think/ 
+> Note: an instance of Watson Translator service is required for the sample code to work. Lite version (free version) of Watson Translator service is available with your IBM Cloud account.
 
-   Promotion: Buy one hamburger and get 1/2 price for the 2nd hamburger,
-   Promotion Location: Dallas,
-   Start Date: 2020-06-01 00:00:00
-   End Date: 2021-12-31 23:59:00
-   Coupon Link: https://www.ibm.com 
-   ```
+> Note: to debug in IBM Cloud Function, you likely need an instance of `IBM Log Analysis with LogDNA`. 
 
-#### 8.3 - Inquire Hamburger Promotion Information Stored in Waston Discovery Service
 
-1. Make a promotion inquiry by entering `any special for ordering hamburger`.
+#### Step 3.2 - Deploy a Service as IBM Cloud Function
 
-1. This time, the Watson assistant has two understanding
-   * `inquire_promotion` as the `intent`
-   * `hamburger` in the entity `@promotion_term`
+It's easy and economical to deploy a microservice as a IBM Cloud Fuction. In this repo, the language translation microservice is deployed to IBM Cloud Function.
 
-1. Since the content in the entity `@promotion_term` is used in the cloud function when making inquires to Watson Discovery service, this time the chatbot only returns the `hamburger` related promotion.
+Alternatively, you may choose deploying the service to different platform such as Cloud Foundry, Kubernetes cluster, OpenShift cluster and etc. 
 
-   ```
-   Here are available specials: 
 
-   Promotion: Buy one hamburger and get 1/2 price for the 2nd hamburger,
-   Promotion Location: Dallas,
-   Start Date: 2020-06-01 00:00:00
-   End Date: 2021-12-31 23:59:00
-   Coupon Link: https://www.ibm.com 
-   ```
+##### Step 3.2.1 - Deploy Cloud Function
 
-1. Configuration of the `Inquire promotion from Discovery Service` node demonstrates 
-   * how to collect inquiry term via the chatbot and pass it to cloud function as parameter
-   * how to build chatbot response based on contents returned by the webhook
-   * how to retrieve external data from Watson Discovery service
+In this section, you deploy your code as a service in IBM Cloud Function. Because the Cloud Functions is not the focus of the repo, basic CLI commands are used to show the procedure.
 
+1. Go back to the `IBM Cloud Shell`.
 
-#### 8.4 - Inquire Promotion Information Stored in DB2 Database
+1. Create action for a service for post-webhook using Node.js environment
 
-1. Make a promotion inquiry by entering `any db2 special`. Intent `#inquire-db2-promotion` is configured to catch the inquiry.
+    ```
+    ibmcloud  fn  action  create  multi-language-pkg-<your initial>/postMessageTranslate  postMessageTranslate.js  --kind nodejs:12  --web  true  --web-secure  <YOURSECRET>
+    ```
 
-1. The `Inquire promotion from DB2 Database` node understands the `intent` and trigger the same Cloud Functions action running in IBM Cloud. 
+    > Note: <YOURSECRET> is a text string that helps to keep your cloud functions secure. Notes down <YOURSECRET> for future reference.
 
-   !["watson-burger-simple Example"](doc/images/inquire-db2-promotion01.png)
+Alternatively, you may also deploy the Cloud Function via IBM Cloud UI.
 
-   * Watson chatbot passes `db2` as the parameter `type`, so the cloud function action makes a API call to DB2 database which returns special promotion information.
-   * The node has an optional slot. If the promotional item or term information is identified, it'll be stored in entity `@promotion_term`. Because this is an optional slot, when no promotional item or term is identified, end user won't be prompted for. In this example, `@promotion_term` contains no information as it's a general promotion inquiry. 
-   * Contents returned by the cloud function is stored in `webhook_result_3` variable.
-   * The node is configured to display `<? $webhook_result_3.result ?>` as the chatbot response.
-   * To identify what JSON elements are available in the return object, `<? $webhook_result_1 ?>` can be tested at development phase.
 
-1. After the chatbot communicates with the cloud function, it replies to the inquiry with a message similar to
+##### Step 3.2.2 - Gather Cloud Function Information
 
-   ```
-   Here are available specials:
+When you configure the Post-webhook of Watson Assistant instance, you need couple of you cloud function information.
 
-   1) Free small drink with purchase of any meal
-   2) Buy one hamburger and 1/2 price for the 2nd hamburger
-   ```
+1. Login to IBM Cloud
 
-#### 8.5 - Inquire Hamburger Promotion Information Stored in DB2 Database
+1. Select the main `Navigation Menu` (often referred as Hamburge menu) at the top-left corner.
 
-1. Make a promotion inquiry by entering `any db2 special for ordering hamburger`.
+1. Select the `Functions` and then `Actions`.
 
-1. This time, the Watson assistant has two understanding
-   * `inquire_db2_promotion` as the `intent`
-   * `hamburger` in the entity `@promotion_term`
+    !["watson-assistant-multi-language-architecture"](docs/images/cloudfunction01.png)
 
-1. Since the content in the entity `@promotion_term` is used in the cloud function when making inquires to DB2 database, this time the chatbot only returns the `hamburger` related promotion.
+1. Select `postMessageTranslate` entry.
 
-   ```
-   Here are available specials:
+1. Navigate to `Endpoints` in the left navigation pane.
 
-   1) Buy one hamburger and 1/2 price for the 2nd hamburger
-   ```
+    !["watson-assistant-multi-language-architecture"](docs/images/cloudfunction02.png)
 
-1. Configuration of the `Inquire promotion from DB2 Database` node demonstrates 
-   * how to collect inquiry term via the chatbot and pass it to cloud function as parameter
-   * how to build chatbot response based on contents returned by the webhook
-   * how to retrieve external data from DB2 database
+1. Collect URL of `HTTP Method`.
 
+1. Collect username and password when `non-IAM` authentication is used. This occurs for the `cloud foundry` name space.
 
-## License
+    a) Copy the CURL command at the bottom. It should look like
 
-This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](https://www.apache.org/licenses/LICENSE-2.0.txt).
+    ```
+    curl -u 6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2 -X POST https://us-south.functions.cloud.ibm.com/api/v1/namespaces/SL2272168_dev/actions/multi-language-pkg/postMessageTranslate?blocking=true
+    ```
+    b) The authentication credential to access the cloud function is embedded as part of the command. In this example, `6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2` is the username and password. 
 
-[Apache Software License (ASL) FAQ](https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
+    > Note: `6e1bf-a76e-4bc2-9c24-8784af9:Vc1jv13mD6nJEIqouEFPwQjLkAnnJ6GzDvTBr3P2` is for illustration purpose. It's not valid credential.
 
-## Links
+    c) Take note of the credential.
 
-* [Demo on youtube](https://youtu.be/6QlAnqSiWvo)
-* [IBM Watson Assistant Docs](https://cloud.ibm.com/docs/services/conversation/dialog-build.html#dialog-build)
-* [Blog for IBM Watson Assistant Slots Code Pattern](https://developer.ibm.com/code/2017/09/19/managing-resources-efficiently-watson-conversation-slots/)
 
-## Learn more
+#### Step 3.3 - Configure Post-Webhook of Watson Assistant Service
 
-* **Artificial Intelligence Code Patterns**: Enjoyed this Code Pattern? Check out our other [AI Code Patterns](https://developer.ibm.com/technologies/artificial-intelligence/).
-* **AI and Data Code Pattern Playlist**: Bookmark our [playlist](https://www.youtube.com/playlist?list=PLzUbsvIyrNfknNewObx5N7uGZ5FKH0Fde) with all of our Code Pattern videos
-* **With Watson**: Want to take your Watson app to the next level? Looking to utilize Watson Brand assets? [Join the With Watson program](https://www.ibm.com/watson/with-watson/) to leverage exclusive brand, marketing, and tech resources to amplify and accelerate your Watson embedded commercial solution.
-* **Kubernetes on IBM Cloud**: Deliver your apps with the combined the power of [Kubernetes and Docker on IBM Cloud](https://www.ibm.com/cloud/container-service)
+Now, you have deployed a service to IBM Cloud Function. Whenever you call the service, the cloud function fires up.
 
+To configure the Post-webhook of Watson Assistant instance,
 
+1. Login to IBM Cloud.
+
+1. Locate and open the Watson Assistant instance.
+
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
+
+1. Open `photo-shop-assistant-<your initial>` Assistant.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant02.png)
+
+1. Click the 3 dots at the top-right corner and select `Assistant settings`.
+
+1. In the left navigation, select `Webhooks` and then `Post-message webhook`.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant03.png)
+
+1. Enable the post-webhook.
+
+1. Enable `Return an error to the client if the webhook call fails` option. When the option is disabled, its label shows `Continue processing user input without webhook update if there is an error`. 
+
+    > Note: you should consider to turn on the option initially while you test the post-webhook. It can help you identify any post-webhook related problem. After the post-webhook works stably, you may evaluate your use case and determine how the option should be set.
+
+1. In the URL field, copy and paste the `HTTP URL` of the cloud function for the post-webhook.
+
+1. Add `.json` extension at the end of the URL to indicate that JSON data should be returned.
+
+1. In the `Secret` field, enter the same `<YOURSECRET>` that was used when you deployed the cloud function. 
+
+    > Note: If you did not specify its secret when deploying the cloud function, you may enter any string here.
+
+1. Enter header information of the post-webhook.
+
+    a) Select `Add header` link.
+    
+    b) Enter `Content-Type` in the `Header name` field.
+    
+    c) Enter `application/json` in the `Header value` field.
+
+    d) Tab out the field. This saves the post-webhook configuration changes.
+
+1. Enter header information for authenticating the post-webhook.
+
+    For `IAM` authentication (used by `non-cloud foundry` name space in IBM Cloud Function),
+
+    a) Select `Add header` link again.
+    
+    b) Enter `X-Require-Whisk-Auth` in the `Header name` field.
+    
+    c) Enter the same `<YOURSECRET>` (that was used when you deployed the cloud function) in the `Header value` field.
+
+    d) Tab out the field. This saves the pre-webhook configuration changes.    
+
+    For `non-IAM` authentication (userid and password) (used by `cloud foundry` name space in IBM Cloud Function),
+
+    a) Select `Add header` link again.
+
+    b) Enter `Authorization` as the header name.
+
+    c) User name and Password are prompted in a popup window.
+    
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant04.png)
+
+    > Note: in case the pop-up is not opened, you may click the `gear` icon to the right of the fields to manually open it.
+
+    d) Enter user name and password for the pre-webhook cloud function. 
+    
+    e) `Save`. The user name and password are encoded before they are stored.
+    
+
+### Step 4 - Verification
+
+With all the deployments and configurations that you have completed, you added the multi-langages capability to your chatbot. 
+
+This is an universal solution. You don't have to do special configuration in order to chat with chatbot in individual language as long as `Watson Translator` supports it.
+
+1. Login to IBM Cloud.
+
+1. Locate and open the Watson Assistant instance.
+
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
+
+1. Open `photo-shop-assistant-<your initial>` Assistant.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant02.png)
+
+1. Select `Preview` at the top-right corner.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant06.png)
+
+1. Enter `imprimir fotografías de 8x10 en acabado brillante`. The chatbot replies in Spanish.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant07.png)
+
+1. Clear the chat history by selecting `Restart conversation` button.
+
+1. Enter `광택 마감의 6 x 8 사진은 얼마입니까`. The chatbot replies in Korean.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant08.png)
+
+1. Clear the chat history by selecting `Restart conversation` button.
+
+1. Enter `اطبع صور 6 × 8 بلمسة نهائية غير لامعة`. The chatbot replies in Arabic.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant09.png)
+
+
+### Step5 - Quickly Port Chatbot Developed in one Language to a Different Lanaguage
+
+Develops once and works everywhere! Have you heard the phrase before? When Java was introduced, it was a popular phrase. It's the main characteristics how Java differentiates itself. About 20 years later, when Kubernetes and RedHat OpenShift became main street for IT deployment, it got popular again.
+
+In fact, the multi-language capability introduced in the repo is another good example. But, `works everywhere` in this context means `works in any language`. You can develop your chatbot once, in English for example, and port to any supported language.
+
+
+#### Step 5.1 - Duplicate the Skill and Set the Language
+
+There are use cases that you may have developed chatbot in English and you like to quickly port to another language. You can certainly rebuild it for a different language. But, it takes time and resource.
+
+The knowledge you have learned in this repo can can help you port an existing chatbot developed in English to a different language in no time. Chinese is used as new language for illustration.
+
+1. Login to IBM Cloud.
+
+1. Locate and open the Watson Assistant instance.
+
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
+
+1. Navigate to `Skills` tab.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant10.png)
+
+1. Select the 3 dots on the `photo-shop` skill tile.
+
+1. Select `Duplicate`.
+
+1. Go back to `Skills` tab.
+
+1. Select the 3 dots on the `photo-shop copy` skill tile.
+
+1. Select `Rename`.
+
+1. Rename to `photo-shop-zh`.
+
+1. Open the new skill.
+
+1. Select `Dialog` in the left navigation pane.
+
+1. Select the `Welcome` node to open its property window.
+
+1. Change context variable `lang_id` to `zh` from `none`.
+
+   !["watson-assistant-multi-language-architecture"](docs/images/assistant12.png)
+
+1. Tab out to save the change.
+
+
+#### Step 5.2 - Configure Assistant
+
+1. Navigate to `Assistant` tab.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant11.png)
+
+1. Select `Create assistant` button.
+
+1. Enter `photo-shop-assistant-zh` as the name.
+
+1. Select ``Create assistant` button.
+
+1. Configure the pre-webhook and post-webhook as you have done. The same source codes and cloud functions can be re-used.
+
+
+### Step 5.3 - Chat in Chinese
+
+As promised at the begining of the section, You can port an existing chatbot to another language in no time. You have done that for chatbot `photo-shop`.
+
+To verify,
+
+1. Login to IBM Cloud.
+
+1. Locate and open the Watson Assistant instance.
+
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
+
+1. Open `photo-shop-assistant-zh` Assistant.
+
+1. Select `Preview` at the top-right corner.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant13.png)
+
+1. The chatbot displays the greeting in Chinese instead of English, although you did not modify its skill which was originally developed in English.
+
+    > Note: The greeting text translation to Chinese is not the best translation for the current context. Since this is not a custom solution, you have to accept the imperfection.
+
+1. Enter `以哑光效果打印 6x8 照片`. The chatbot continuosely chats in Chinese.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant14.png)
+
+    > Note: This is a perfect translation for the current context. You may have to evaluate your specific use cases to determine if this easy and universal multi-languages solution offers a valid solution to your use cases.
+
+
+### Step 5.4 - Quickly Port to Spanish
+
+Now, let's how easily and quickly you can switch to Spanish.
+
+1. Navigate to `Skills` tag.
+
+1. Open skill `photo-shop-zh`.
+
+1. Select the `Welcome` node to open its property window.
+
+1. Change context variable `lang_id` to `es` from `zh`.
+
+   !["watson-assistant-multi-language-architecture"](docs/images/assistant15.png)
+
+1. Tab out to save the change.
+
+
+### Step 5.5 - Chat in Spanish
+
+You just port your chatbot to Spanish from English. To verify,
+
+1. Login to IBM Cloud.
+
+1. Locate and open the Watson Assistant instance.
+
+1. On the `Manage` tab of Watson Assistant window, click `Launch Watson Assistant` button.
+
+1. Open `photo-shop-assistant-zh` Assistant.
+
+1. Select `Preview` at the top-right corner.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant16.png)
+
+1. The chatbot displays the greeting in Spanish instead of English or Chinese, after you made one change to the context variable `lang_id` in the `Welcome` node.
+
+1. Enter `imprimir fotografías de 8x10 en acabado brillante`. The chatbot continuosely chats in Spanish.
+
+    !["watson-assistant-multi-language-architecture"](docs/images/assistant17.png)
 
 
 
